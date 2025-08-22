@@ -2,6 +2,20 @@ name: Deploy Service
 on:
   repository_dispatch:
     types: [deploy-service]
+  workflow_dispatch:
+    inputs:
+      service_name:
+        description: 'Service name'
+        required: true
+        type: string
+      environment:
+        description: 'Environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
 
 jobs:
   deploy:
@@ -12,8 +26,14 @@ jobs:
       
       - name: Get inputs
         run: |
-          echo "Service: ${{ github.event.client_payload.service_name }}"
-          echo "Environment: ${{ github.event.client_payload.environment }}"
+          if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
+            echo "Service: ${{ github.event.client_payload.service_name }}"
+            echo "Environment: ${{ github.event.client_payload.environment }}"
+            echo "Port Run ID: ${{ github.event.client_payload.port_context.run_id }}"
+          else
+            echo "Service: ${{ github.event.inputs.service_name }}"
+            echo "Environment: ${{ github.event.inputs.environment }}"
+          fi
       
       - name: Simulate deployment
         run: |
@@ -22,6 +42,7 @@ jobs:
           echo "Deployment complete"
       
       - name: Update Port status
+        if: github.event_name == 'repository_dispatch'
         uses: port-labs/port-github-action@v1
         with:
           clientId: ${{ secrets.PORT_CLIENT_ID }}
