@@ -22,7 +22,7 @@ jobs:
             jira_host: "https://jasonnwakaeze.atlassian.net"
             atlassian_user_email: ${{ secrets.atlassianUserEmail }}
             atlassian_user_token: ${{ secrets.atlassianUserToken }}
-            initialize_port_resources: false  # Remove THIS LINE on first time run
+            # initialize_port_resources: false  # Remove THIS LINE on first time run
 
 
 
